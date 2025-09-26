@@ -1,16 +1,23 @@
 <script>
 	import { onMount } from 'svelte';
+	import sortObjectArray from '$lib/sort.js';
 
 	let { data } = $props();
 
 	let vms = $state([]);
 	let key = $state('name');
-	let asc = $state(true);
+	let asc = $state(false);
 	let showOffline = $state(true);
 
 	onMount(() => {
 		sortBy();
 	});
+
+	const meta = {
+		mem: { type: 'number', col: 'memory_size_MiB' },
+		cpu: { type: 'number', col: 'cpu_count' },
+		name: { type: 'string', col: 'name' }
+	};
 
 	function sortBy(pkey = 'name') {
 		if (pkey === key) {
@@ -19,47 +26,8 @@
 			asc = true;
 		}
 
-		switch (pkey) {
-			case 'mem':
-				key = 'mem';
-				vms = data.vms.sort((a, b) => {
-					if (a.memory_size_MiB < b.memory_size_MiB) {
-						return asc ? -1 : 1;
-					} else if (a.memory_size_MiB > b.memory_size_MiB) {
-						return asc ? 1 : -1;
-					} else {
-						return 0;
-					}
-				});
-				break;
-			case 'cpu':
-				key = 'cpu';
-				vms = data.vms.sort((a, b) => {
-					if (a.cpu_count < b.cpu_count) {
-						return asc ? -1 : 1;
-					} else if (a.cpu_count > b.cpu_count) {
-						return asc ? 1 : -1;
-					} else {
-						return 0;
-					}
-				});
-				break;
-			default:
-				key = 'name';
-				vms = data.vms.sort((a, b) => {
-					const ret = Intl.Collator('tr').compare(
-						a.name.toLocaleLowerCase('tr'),
-						b.name.toLocaleLowerCase('tr')
-					);
-					if (ret < 0) {
-						return asc ? -1 : 1;
-					} else if (ret > 0) {
-						return asc ? 1 : -1;
-					} else {
-						return 0;
-					}
-				});
-		}
+		key = pkey;
+		vms = sortObjectArray(data.vms, meta[pkey], asc);
 	}
 
 	function filterOffline() {

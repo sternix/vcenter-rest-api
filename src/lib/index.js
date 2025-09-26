@@ -5,16 +5,17 @@ import { VCENTER_URL, VCENTER_USERNAME, VCENTER_PASSWORD } from '$env/static/pri
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
 
 export function getUrl(path) {
-    return `${VCENTER_URL}${path}`;
+	return `${VCENTER_URL}${path}`;
 }
 
 export async function sessionId() {
-    const response = await fetch(getUrl('/api/session'), {
-        method: 'POST',
-        headers: {
-            Authorization: 'Basic ' + Buffer.from(`${VCENTER_USERNAME}:${VCENTER_PASSWORD}`).toString('base64')
-        }
-    });
+	const response = await fetch(getUrl('/api/session'), {
+		method: 'POST',
+		headers: {
+			Authorization:
+				'Basic ' + Buffer.from(`${VCENTER_USERNAME}:${VCENTER_PASSWORD}`).toString('base64')
+		}
+	});
 
-    return await response.json();
+	return await response.json();
 }
